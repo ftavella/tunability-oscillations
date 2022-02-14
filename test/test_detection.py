@@ -1,5 +1,5 @@
 """
-Unit tests for the detection library
+Unit tests for the detection module
 """
 
 import os
