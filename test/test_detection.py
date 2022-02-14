@@ -6,7 +6,7 @@ import os
 import sys
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '../src'))
 sys.path.append(ROOT_DIR)
-from simulation_tools import detection  # noqa: E402
+from simulation_tools import detection  # noqa : E402
 
 
 class TestDetection:
