@@ -1,2 +1,2 @@
-# tunability-oscillations
-Computational Research on the tunability of biological oscillators
+# Computational Research on the tunability of biological oscillators
+
