@@ -1,14 +1,19 @@
 """
-- A brief description of the module and its purpose
-- A list of any classes, exception, functions, and any other objects exported
-  by the module
+Module defining the classes and methods for representing a biological network
+of interacting nodes.
+
+Classes
+-------
+
+Network
+    A class used to represent a biochemical network with defined parameters
 """
 
 from typing import Callable
 import numpy as np
 
 
-class Network():
+class Network:
     """A class used to represent a biochemical network with defined parameters
 
     Attributes
@@ -19,9 +24,19 @@ class Network():
     equations : function
         Function containing ODE equations that is suitable for simulation with
         scipy's solve_ivp module. The equations are defined
+    nodes : int
+        Number of nodes of the network. Inferred from connectivity
+    edges : list
+        List of edges. Edges are represented as 2D tuples that contain the
+        indexes where connectivity is different from 0.
+    parameters : list
+        A list containing all parameter arrays. The list is created from
+        param_dict (see __init__).
 
     Methods
     -------
+    __edge_list_from_connectivity()
+        Create a list of edges from the connectivity matrix.
     __create_gamma_terms()
         Creates strings representing the interaction terms of the network
     __create_function_str()
@@ -31,13 +46,20 @@ class Network():
         Defines a python function encoding the ODE equations of the model.
     """
 
-    def __init__(self, connectivity: np.ndarray):
+    def __init__(self, connectivity: np.ndarray, param_dict: dict):
         """
         Parameters
         ----------
         connectivity : ndarray
             Two-dimensional array specifying the interaction among nodes. Only
             0, 1, and -1 are allowed as interaction types
+        param_dict : dict
+            Dictionary specifying the parameters of the model. The only allowed
+            keys are A, B, G, K, N. the corresponding values should have the
+            correct dimension. Arrays for A (alpha) and B (beta) should have a
+            length that matches the number of nodes in the network. Arrays for
+            G, K, and N (gamma, kappa, eta) should have the same shape as the
+            connectivity.
 
         Raises
         ------
@@ -46,7 +68,8 @@ class Network():
 
         ValueError
             If connectivity doesn't have the right dimension or
-            values at each entry
+            values at each entry. Also ValueError is raised if parameter
+            arrays don't have the correct dimensions
         """
 
         if not isinstance(connectivity, np.ndarray):
@@ -58,9 +81,48 @@ class Network():
                             the same length")
         elif np.any(~np.isin(np.unique(connectivity), [-1, 0, 1])):
             raise ValueError("Input should only contain 0, 1, -1")
+        elif np.any(~np.isin(list(param_dict.keys()),
+                    ["A", "B", "G", "K", "N"])):
+            raise ValueError("Parameter dict can only have keys named: \
+                             A, B, G, K, N")
 
         self.connectivity = connectivity
         self.equations = self.__create_equations()
+        self.nodes = np.shape(connectivity)[0]
+        self.edges = self.__edge_list_from_connectivity()
+
+        for key, value in param_dict.items():
+            if key == "A" or key == "B":
+                if np.shape(value)[0] != self.nodes:
+                    raise ValueError(f"Parameter array for {key} should have \
+                                     the same length as the number of rows in \
+                                     the connectivity matrix")
+            elif key == "G" or key == "K" or key == "N":
+                if np.shape(value) != np.shape(connectivity):
+                    raise ValueError("Parameter array for {key} should have \
+                                     the same dimension as the connectivity")
+
+        self.parameters = [param_dict[key] for key in
+                           ["A", "B", "G", "K", "N"]]
+
+    def __edge_list_from_connectivity(self) -> list:
+        """Create a list of edges from the connectivity matrix. Edges are
+        represented as tuples containing the index of the maxtrix where
+        connectivity is different from 0
+
+        Returns
+        -------
+        list
+            A list of tuples. Each tuple represents the two dimensional index
+            where the connectivity matrix is different from 0.
+        """
+
+        edges = []
+        for idx in range(self.nodes):
+            for jdx in range(self.nodes):
+                if self.connectivity[idx, jdx] != 0:
+                    edges.append((idx, jdx))
+        return edges
 
     def __create_gamma_terms(self) -> list:
         """Creates strings representing the interaction terms of the network
