@@ -32,6 +32,11 @@ class Network:
     parameters : list
         A list containing all parameter arrays. The list is created from
         param_dict (see __init__).
+    features : dict
+        Dictionary with the properties of the network. Properties are status
+        (not_simulated, steady_state, not_enough_peaks, oscillatory), per
+        (period), amp (amplitude), and end_point (final state of the
+        simulation). Per, amp, and end_point are stored for each node.
 
     Methods
     -------
@@ -104,6 +109,15 @@ class Network:
 
         self.parameters = [param_dict[key] for key in
                            ["A", "B", "G", "K", "N"]]
+
+        self.features = {
+            "status": "not_simulated",
+            "per": [np.NaN for _ in range(self.nodes)],
+            "per_cv": [np.NaN for _ in range(self.nodes)],
+            "amp": [np.NaN for _ in range(self.nodes)],
+            "amp_cv": [np.NaN for _ in range(self.nodes)],
+            "end_point": [np.NaN for _ in range(self.nodes)],
+        }
 
     def __edge_list_from_connectivity(self) -> list:
         """Create a list of edges from the connectivity matrix. Edges are
