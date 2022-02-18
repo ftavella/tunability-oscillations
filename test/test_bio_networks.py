@@ -118,9 +118,9 @@ class TestBioNetworks():
             with pytest.raises(ValueError):
                 _ = bn.Network(connectivity, p_dict_new)
 
-    def test_parameters_have_wrong_key(self):
+    def test_parameters_have_wrong_keys(self):
         connectivity = np.array([[0, 0, 1], [1, 0, 0], [0, -1, 0]])
-        p_dict = {
+        more_params = {
             "A": np.array([0.00004564, 0.16342066, 0.70351496]),
             "B": np.array([56.67356362, 50.87885942, 30.31904319]),
             "G": np.array([[0, 0, 1657.39796806],
@@ -134,5 +134,20 @@ class TestBioNetworks():
                           [0, 6.80130072, 0]]),
             "H": np.array([1.0, 1.0, 1.0])
         }
+        less_params = {
+            "A": np.array([0.00004564, 0.16342066, 0.70351496]),
+            "G": np.array([[0, 0, 1657.39796806],
+                          [6988.78292809, 0, 0],
+                          [0, 7461.31128709, 0]]),
+            "K": np.array([[0, 0, 0.11196140],
+                          [0.50912113, 0, 0],
+                          [0, 0.33210760, 0]]),
+            "N": np.array([[0, 0, 3.67709117],
+                          [7.17307667, 0, 0],
+                          [0, 6.80130072, 0]]),
+        }
         with pytest.raises(ValueError):
-            _ = bn.Network(connectivity, p_dict)
+            _ = bn.Network(connectivity, more_params)
+
+        with pytest.raises(ValueError):
+            _ = bn.Network(connectivity, less_params)

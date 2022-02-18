@@ -81,13 +81,14 @@ class Network:
             raise TypeError("Input should be a numpy array")
         if len(connectivity.shape) != 2:
             raise ValueError("Connectivity matrix should have dimension 2")
-        elif connectivity.shape[0] != connectivity.shape[1]:
+        if connectivity.shape[0] != connectivity.shape[1]:
             raise ValueError("Dimensions of connectivity matrix should have \
                             the same length")
-        elif np.any(~np.isin(np.unique(connectivity), [-1, 0, 1])):
+        if np.any(~np.isin(np.unique(connectivity), [-1, 0, 1])):
             raise ValueError("Input should only contain 0, 1, -1")
-        elif np.any(~np.isin(list(param_dict.keys()),
-                    ["A", "B", "G", "K", "N"])):
+        param_keys = ["A", "B", "G", "K", "N"]
+        if np.any(~np.isin(list(param_dict.keys()), param_keys)) or \
+           np.any(~np.isin(param_keys, list(param_dict.keys()))):
             raise ValueError("Parameter dict can only have keys named: \
                              A, B, G, K, N")
 
