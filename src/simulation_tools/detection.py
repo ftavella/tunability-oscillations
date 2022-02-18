@@ -16,7 +16,7 @@ class Hyperparameters:
         Threshold for the norm of velocity to determine whether a system has
         reached a steady state or not
     solve_method : str
-        String defining which method to use in solve_ivp (see scipy's 
+        String defining which method to use in solve_ivp (see scipy's
         solve_ivp documentation for options)
     rtol : float
         Relative tolerance for solve_ivp's solution
@@ -48,11 +48,11 @@ class Hyperparameters:
             Dictionary specifying the hyperparameters for the detection of
             oscillations.
         """
- 
+
         # Check that hparam_dict has the correct attributes
         required_hparams = ["vel_threshold", "solve_method", "rtol", "atol",
                             "find_peaks_tpoints", "peak_dist", "peak_prom",
-                            "num_peak_threshold", "equil_time", "T_mult",]
+                            "num_peak_threshold", "equil_time", "T_mult"]
         if np.any(~np.isin(list(hparam_dict.keys()), required_hparams)) or \
            np.any(~np.isin(required_hparams, list(hparam_dict.keys()))):
             raise ValueError(f"Hyperparameter dict should contain the \
@@ -108,8 +108,8 @@ class OscillationDetector:
     def __calculate_features(self, network, y0, T_guess):
         """Calculates the period, amplitude, status, and endpoint of a network
         and sets the network's features attribute.
-        
-        Network is simulated and oscillations are analyzed using peak 
+
+        Network is simulated and oscillations are analyzed using peak
         detection. If not enough peaks are detected the status is set to
         'not_enough_peaks' plus information that tells where not enough peaks
         were found. For example if not enough maximum peaks were found for
