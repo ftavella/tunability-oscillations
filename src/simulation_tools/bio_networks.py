@@ -11,7 +11,7 @@ Network
 
 from typing import Callable
 import numpy as np
-from numba import njit
+from numba import njit  # noqa : F401
 
 
 class Network:
