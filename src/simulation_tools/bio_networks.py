@@ -11,6 +11,7 @@ Network
 
 from typing import Callable
 import numpy as np
+from numba import njit
 
 
 class Network:
@@ -187,13 +188,14 @@ class Network:
         """
 
         G_terms = self.__create_gamma_terms()
-        fn_template = "def equations(t, x, A, B, G, K, N):"
+        fn_template = "def equations_f(t, x, A, B, G, K, N):"
         return_template = "\n\treturn np.array(["
         for idx, terms in enumerate(G_terms):
             fn_template += f"\n\tdx{idx}dt ="
             fn_template += f" B[{idx}]*(A[{idx}] - x[{idx}]) {terms}"
             return_template += f"dx{idx}dt,"
         fn_template += return_template[:-1] + "])"
+        fn_template += "\nequations = njit(equations_f)"
         return fn_template
 
     def __create_equations(self) -> Callable:
